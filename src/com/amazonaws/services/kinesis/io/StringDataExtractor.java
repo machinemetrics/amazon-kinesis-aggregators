@@ -17,6 +17,10 @@
 package com.amazonaws.services.kinesis.io;
 
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -61,7 +65,7 @@ public class StringDataExtractor<T extends StringDataExtractor<T>> extends Abstr
 
     private String dateFormat;
 
-    private SimpleDateFormat dateFormatter;
+    private DateTimeFormatter dateFormatter;
 
     protected List<Object> originalSummaryExpressions = new ArrayList<>();
 
@@ -107,7 +111,7 @@ public class StringDataExtractor<T extends StringDataExtractor<T>> extends Abstr
         try {
             int summaryIndex = -1;
             String dateString;
-            Date dateValue;
+            OffsetDateTime dateValue;
             List<AggregateData> data = new ArrayList<>();
 
             List<List<String>> content = serialiser.toClass(event);
@@ -136,11 +140,11 @@ public class StringDataExtractor<T extends StringDataExtractor<T>> extends Abstr
                     if (this.dateValueIndex != -1) {
                         dateString = line.get(dateValueIndex);
                         if (this.dateFormat != null) {
-                            dateValue = dateFormatter.parse(dateString);
+                            dateValue = OffsetDateTime.parse(dateString, dateFormatter);
                         } else {
                             // no formatter, so treat as epoch seconds
                             try {
-                                dateValue = new Date(Long.parseLong(dateString));
+                                dateValue = OffsetDateTime.ofInstant(Instant.ofEpochMilli(Long.parseLong(dateString)), ZoneId.of("UTC"));
                             } catch (Exception e) {
                                 LOG.error(String.format(
                                         "Unable to create Date Value element from item '%s' due to invalid format as Epoch Seconds",
@@ -149,7 +153,7 @@ public class StringDataExtractor<T extends StringDataExtractor<T>> extends Abstr
                             }
                         }
                     } else {
-                        dateValue = new Date(System.currentTimeMillis());
+                        dateValue = OffsetDateTime.now(ZoneId.of("UTC"));
                     }
 
                     // get the summed values
@@ -194,7 +198,7 @@ public class StringDataExtractor<T extends StringDataExtractor<T>> extends Abstr
     public T withDateFormat(String dateFormat) {
         if (dateFormat != null && !dateFormat.equals("")) {
             this.dateFormat = dateFormat;
-            this.dateFormatter = new SimpleDateFormat(dateFormat);
+            this.dateFormatter = DateTimeFormatter.ofPattern(dateFormat);
         }
         return (T) this;
     }

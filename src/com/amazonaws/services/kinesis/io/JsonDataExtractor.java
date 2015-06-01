@@ -17,6 +17,11 @@
 package com.amazonaws.services.kinesis.io;
 
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -44,7 +49,7 @@ public class JsonDataExtractor extends AbstractDataExtractor implements IDataExt
 
     private String labelName, dateFormat, uniqueIdAttribute, dateValueAttribute;
 
-    private SimpleDateFormat dateFormatter;
+    private DateTimeFormatter dateFormatter;
 
     private List<String> summaryAttributes;
 
@@ -74,7 +79,7 @@ public class JsonDataExtractor extends AbstractDataExtractor implements IDataExt
     public List<AggregateData> getData(InputEvent event) throws SerializationException {
         try {
             List<AggregateData> aggregateData = new ArrayList<>();
-            Date dateValue = null;
+            OffsetDateTime dateValue = null;
             JsonNode jsonContent = null;
             String dateString, summary = null;
             sumUpdates = new HashMap<>();
@@ -128,11 +133,11 @@ public class JsonDataExtractor extends AbstractDataExtractor implements IDataExt
 
                     // turn date as long or string into Date
                     if (this.dateFormat != null) {
-                        dateValue = dateFormatter.parse(dateString);
+                        dateValue = OffsetDateTime.parse(dateString, dateFormatter);
                     } else {
                         // no formatter, so treat as epoch seconds
                         try {
-                            dateValue = new Date(Long.parseLong(dateString));
+                            dateValue = OffsetDateTime.ofInstant(Instant.ofEpochMilli(Long.parseLong(dateString)), ZoneId.of("UTC"));
                         } catch (Exception e) {
                             LOG.error(String.format(
                                     "Unable to create Date Value element from item '%s' due to invalid format as Epoch Seconds",
@@ -142,7 +147,7 @@ public class JsonDataExtractor extends AbstractDataExtractor implements IDataExt
                     }
                 } else {
                     // no date value attribute configured, so use now
-                    dateValue = new Date(System.currentTimeMillis());
+                    dateValue = OffsetDateTime.now(ZoneId.of("UTC"));
                 }
 
                 // get the summed values
@@ -206,7 +211,7 @@ public class JsonDataExtractor extends AbstractDataExtractor implements IDataExt
     public JsonDataExtractor withDateFormat(String dateFormat) {
         if (dateFormat != null && !dateFormat.equals("")) {
             this.dateFormat = dateFormat;
-            this.dateFormatter = new SimpleDateFormat(dateFormat);
+            this.dateFormatter = DateTimeFormatter.ofPattern(dateFormat);
         }
         return this;
     }
