@@ -88,10 +88,11 @@ public class JsonDataExtractor extends AbstractDataExtractor implements IDataExt
 
             // log a warning if we didn't get anything back from the serialiser
             // - this could be OK, but probably isn't
-            if (items == null || items.size() == 0)
-                LOG.warn(String.format(
-                        "Failed to deserialise any content for Record (Partition Key %s, Sequence %s",
-                        event.getPartitionKey(), event.getSequenceNumber()));
+            // it would be OK, for example, if you have filterRegex
+//            if (items == null || items.size() == 0)
+//                LOG.warn(String.format(
+//                        "Failed to deserialise any content for Record (Partition Key %s, Sequence %s",
+//                        event.getPartitionKey(), event.getSequenceNumber()));
 
             // process all the items returned by the serialiser
             for (String item : items) {
