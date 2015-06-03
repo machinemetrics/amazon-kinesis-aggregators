@@ -164,7 +164,7 @@ public class ExternalConfigurationModel {
 
                 try {
                     TimeHorizon th = TimeHorizon.valueOf(timeHorizonName);
-                    th.setUTC(true);
+                    th.setUTC(utc);
 
                     if (th.equals(TimeHorizon.MINUTES_GROUPED) && granularity == -1) {
                         throw new InvalidConfigurationException(
