@@ -17,6 +17,10 @@
 package com.amazonaws.services.kinesis.io;
 
 import java.lang.reflect.Method;
+import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -41,6 +45,7 @@ import com.amazonaws.services.kinesis.aggregators.summary.SummaryConfiguration;
 import com.amazonaws.services.kinesis.aggregators.summary.SummaryElement;
 import com.amazonaws.services.kinesis.io.serializer.IKinesisSerializer;
 import com.amazonaws.services.kinesis.io.serializer.JsonSerializer;
+import org.joda.time.LocalDateTime;
 
 /**
  * IDataExtractor which supports extracting data from Objects via reflected
@@ -68,7 +73,7 @@ public class ObjectExtractor extends AbstractDataExtractor implements IDataExtra
 
     private final Log LOG = LogFactory.getLog(ObjectExtractor.class);
 
-    private Date dateValue;
+    private OffsetDateTime dateValue;
 
     private Map<String, Double> sumUpdates = new HashMap<>();
 
@@ -233,12 +238,12 @@ public class ObjectExtractor extends AbstractDataExtractor implements IDataExtra
                 eventDate = dateMethod.invoke(o);
 
                 if (eventDate == null) {
-                    dateValue = new Date(System.currentTimeMillis());
+                    dateValue = OffsetDateTime.now(ZoneId.of("UTC"));
                 } else {
                     if (eventDate instanceof Date) {
-                        dateValue = (Date) eventDate;
+                        dateValue = OffsetDateTime.ofInstant(((Date) eventDate).toInstant(), ZoneId.of("UTC"));
                     } else if (eventDate instanceof Long) {
-                        dateValue = new Date((Long) eventDate);
+                        dateValue = OffsetDateTime.ofInstant(Instant.ofEpochMilli((Long)eventDate), ZoneId.of("UTC"));
                     } else {
                         throw new Exception(String.format(
                                 "Cannot use data type %s for date value on event",

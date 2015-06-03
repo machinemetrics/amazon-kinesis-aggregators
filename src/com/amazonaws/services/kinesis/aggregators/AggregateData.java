@@ -16,6 +16,7 @@
  */
 package com.amazonaws.services.kinesis.aggregators;
 
+import java.time.OffsetDateTime;
 import java.util.Date;
 import java.util.Map;
 
@@ -24,11 +25,11 @@ public class AggregateData {
 
     private LabelSet labels;
 
-    private Date date;
+    private OffsetDateTime date;
 
     private Map<String, Double> summaries;
 
-    public AggregateData(String uniqueId, LabelSet labels, Date date, Map<String, Double> summaries) {
+    public AggregateData(String uniqueId, LabelSet labels, OffsetDateTime date, Map<String, Double> summaries) {
         this.uniqueId = uniqueId;
         this.labels = labels;
         this.date = date;
@@ -47,7 +48,7 @@ public class AggregateData {
         return this.labels;
     }
 
-    public Date getDate() {
+    public OffsetDateTime getDate() {
         return this.date;
     }
 

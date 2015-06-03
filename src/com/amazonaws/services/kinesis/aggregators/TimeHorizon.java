@@ -16,17 +16,15 @@
  */
 package com.amazonaws.services.kinesis.aggregators;
 
-import java.text.SimpleDateFormat;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 public enum TimeHorizon {
     SECOND(0, "MM-dd HH:mm:ss", "s"), MINUTE(1, "MM-dd HH:mm:00", "m"), MINUTES_GROUPED(1, null,
             "mb") {
-        private Calendar calendar = Calendar.getInstance();
-
         private int scope;
 
         @Override
@@ -40,13 +38,12 @@ public enum TimeHorizon {
         }
 
         @Override
-        public String getValue(Date forDate) {
-            calendar.setTime(forDate);
-            int minutes = calendar.get(Calendar.MINUTE);
+        public String getValue(OffsetDateTime forDate) {
+            int minutes = forDate.getMinute();
             int bucket = new Double(Math.floor(minutes / scope) * scope).intValue();
 
             return String.format("%s:%02d:00",
-                    new SimpleDateFormat("yyyy-MM-dd HH").format(forDate), bucket);
+                    forDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH")), bucket);
         }
     },
     HOUR(2, "MM-dd HH:00:00", "H"), DAY(3, "MM-dd 00:00:00", "d"), MONTH(4, "MM-01 00:00:00", "M"), YEAR(
@@ -57,7 +54,7 @@ public enum TimeHorizon {
          * Dynamo wont allow an empty value
          */
         @Override
-        public String getValue(Date forDate) {
+        public String getValue(OffsetDateTime forDate) {
             return "*";
         }
     };
@@ -74,20 +71,23 @@ public enum TimeHorizon {
 
     private String abbrev;
 
-    private SimpleDateFormat getMask() {
-        return new SimpleDateFormat("yyyy-" + this.mask);
+    private boolean utcShift;
+
+    private DateTimeFormatter getMask() {
+        return DateTimeFormatter.ofPattern("yyyy-" + this.mask);
     }
 
     public String getAbbrev() {
         return this.abbrev;
     }
 
-    public String getItemWithMultiValueFormat(Date dateValue) {
+    public String getItemWithMultiValueFormat(OffsetDateTime dateValue) {
         return getAbbrev() + "-" + getValue(dateValue);
     }
 
-    public String getValue(Date forDate) {
-        return getMask().format(forDate);
+    public String getValue(OffsetDateTime forDate) {
+        OffsetDateTime dt = utcShift ? forDate.withOffsetSameInstant(ZoneOffset.UTC) : forDate;
+        return dt.format(getMask());
     }
 
     /**
@@ -130,5 +130,13 @@ public enum TimeHorizon {
 
     public void setGranularity(int scope) throws Exception {
         throw new Exception("Not Implemented");
+    }
+
+    public boolean isUTC() {
+        return utcShift;
+    }
+
+    public void setUTC (boolean state) {
+        utcShift = state;
     }
 }

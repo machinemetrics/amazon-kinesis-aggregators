@@ -145,6 +145,13 @@ public class ExternalConfigurationModel {
                 String t = timeHorizonValues.next().asText();
                 String timeHorizonName = null;
                 int granularity = -1;
+                boolean utc = false;
+
+                // process UTC-shifting time horizons
+                if (t.contains("-UTC")) {
+                    t = String.join("", t.split("-UTC"));
+                    utc = true;
+                }
 
                 // process parameterised time horizons
                 if (t.contains("MINUTES_GROUPED")) {
@@ -157,6 +164,7 @@ public class ExternalConfigurationModel {
 
                 try {
                     TimeHorizon th = TimeHorizon.valueOf(timeHorizonName);
+                    th.setUTC(utc);
 
                     if (th.equals(TimeHorizon.MINUTES_GROUPED) && granularity == -1) {
                         throw new InvalidConfigurationException(

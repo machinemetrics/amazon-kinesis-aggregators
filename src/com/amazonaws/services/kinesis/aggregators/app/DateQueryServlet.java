@@ -18,6 +18,7 @@ package com.amazonaws.services.kinesis.aggregators.app;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.time.OffsetDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -94,12 +95,12 @@ public class DateQueryServlet extends AbstractQueryServlet {
         String granularity = request.getParameter(GRANULARITY_PARAM);
 
         // create the date item
-        Date d = null;
+        OffsetDateTime d = null;
         try {
-            d = StreamAggregator.dateFormatter.parse(dateValue);
+            d = OffsetDateTime.parse(dateValue, StreamAggregator.dateTimeFormatter);
         } catch (Exception e) {
             doError(response, String.format("Date Parameter must be in format %s",
-                    StreamAggregator.dateFormatter.getDateFormatSymbols().toString()));
+                    StreamAggregator.dateFormatter.toString()));
             return;
         }
 

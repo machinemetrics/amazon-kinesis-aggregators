@@ -18,6 +18,9 @@ package com.amazonaws.services.kinesis.aggregators;
 
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -111,6 +114,8 @@ public class StreamAggregator implements IStreamAggregator {
     public static final String REF_SEQUENCE = "__sequence";
 
     public static final SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+    public static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     protected String namespace;
 
@@ -656,7 +661,7 @@ public class StreamAggregator implements IStreamAggregator {
 
         BigInteger thisSequence;
         List<AggregateData> extractedItems = null;
-        Date eventDate = null;
+        OffsetDateTime eventDate = null;
 
         try {
             for (InputEvent event : events) {
@@ -720,7 +725,7 @@ public class StreamAggregator implements IStreamAggregator {
                         // extract, then use the current time
                         eventDate = data.getDate();
                         if (eventDate == null) {
-                            eventDate = new Date(System.currentTimeMillis());
+                            eventDate = OffsetDateTime.now(ZoneId.of("UTC"));
                         }
 
                         // generate the local updates, one per time horizon that
@@ -786,7 +791,7 @@ public class StreamAggregator implements IStreamAggregator {
      * @return A list of data stored in Dynamo DB for the time range
      * @throws Exception
      */
-    public List<Map<String, AttributeValue>> queryByDate(Date dateValue, TimeHorizon h,
+    public List<Map<String, AttributeValue>> queryByDate(OffsetDateTime dateValue, TimeHorizon h,
             ComparisonOperator comp, int threads) throws Exception {
         if (!(this.dataStore instanceof DynamoDataStore)) {
             throw new Exception("Unable to Query by Date unless Data Store is Dynamo DB");
