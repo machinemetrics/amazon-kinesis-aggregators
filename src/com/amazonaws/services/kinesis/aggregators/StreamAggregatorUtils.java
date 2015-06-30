@@ -212,7 +212,8 @@ public class StreamAggregatorUtils {
      * @return
      */
     public static Map<String, AttributeValue> getTableKey(UpdateKey updateKey) {
-        return getTableKey(updateKey.getAggregateColumnName(), updateKey.getAggregatedValue(),
+        return getTableKey(updateKey.getAggregateColumnName(),
+                updateKey.getTimeHorizon().getAbbrev() + "-" + updateKey.getAggregatedValue(),
                 updateKey.getDateValueColumnName(), updateKey.getDateValue());
     }
 
