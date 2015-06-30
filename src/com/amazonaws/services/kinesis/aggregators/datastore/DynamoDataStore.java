@@ -179,10 +179,10 @@ public class DynamoDataStore implements IDataStore {
 
                 Map<String, AttributeValueUpdate> updates = new HashMap<>();
 
-                updates.put(
+                /* updates.put(
                         SCATTER_PREFIX_ATTRIBUTE,
                         new AttributeValueUpdate().withAction(AttributeAction.PUT).withValue(
-                                new AttributeValue().withN("" + r.nextInt(SCATTER_WIDTH))));
+                                new AttributeValue().withN("" + r.nextInt(SCATTER_WIDTH))));*/
 
                 // add the event count update to the list of updates to be made
                 updates.put(
@@ -463,10 +463,11 @@ public class DynamoDataStore implements IDataStore {
             }
         };
 
-        Collection<GlobalSecondaryIndex> gsi = new ArrayList<>();
+        Collection<GlobalSecondaryIndex> gsi = null; // new ArrayList<>();
 
         // Global Secondary Index for accessing the table by date item
-        gsi.add(new GlobalSecondaryIndex().withIndexName(
+        // We do not need to query on date alone, so we do not need to maintain this index.
+        /* gsi.add(new GlobalSecondaryIndex().withIndexName(
                 StreamAggregatorUtils.getDateDimensionIndexName(tableName, setDateColumn)).withKeySchema(
                 new KeySchemaElement().withAttributeName(SCATTER_PREFIX_ATTRIBUTE).withKeyType(
                         KeyType.HASH),
@@ -476,7 +477,7 @@ public class DynamoDataStore implements IDataStore {
                         setWriteCapacity)));
 
         attributes.add(new AttributeDefinition().withAttributeName(SCATTER_PREFIX_ATTRIBUTE).withAttributeType(
-                "N"));
+                "N")); */
 
         // table is hash/range on value and date
         List<KeySchemaElement> key = new ArrayList<KeySchemaElement>() {

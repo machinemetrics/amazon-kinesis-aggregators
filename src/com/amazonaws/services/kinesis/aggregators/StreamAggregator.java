@@ -793,7 +793,9 @@ public class StreamAggregator implements IStreamAggregator {
      */
     public List<Map<String, AttributeValue>> queryByDate(OffsetDateTime dateValue, TimeHorizon h,
             ComparisonOperator comp, int threads) throws Exception {
-        if (!(this.dataStore instanceof DynamoDataStore)) {
+        throw new Exception("Query by Date not supported");
+
+        /* if (!(this.dataStore instanceof DynamoDataStore)) {
             throw new Exception("Unable to Query by Date unless Data Store is Dynamo DB");
         }
 
@@ -819,7 +821,7 @@ public class StreamAggregator implements IStreamAggregator {
         List<Map<String, AttributeValue>> items = ((DynamoDataStore) this.dataStore).queryEngine().parallelQueryDate(
                 this.dataExtractor.getDateValueName(), conditions, threads);
 
-        return items;
+        return items;*/
     }
 
     public List<TableKeyStructure> parallelQueryKeys(QueryKeyScope scope, int threads)
