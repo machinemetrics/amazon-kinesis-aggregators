@@ -121,7 +121,7 @@ You can configure summary items and the type of summary using a miniature specif
 * **MIN** - Calculates the minimum value observed for the time period and label values.
 * **MAX** - Calculates the maximum value observed for the time period and label values.
 * **FIRST** - Stores the first observed value for the time period and label values.
-* **MAX** - Is equal to the latest value for the time period and label values.
+* **LAST** - Is equal to the latest value for the time period and label values.
 
 Summary items can have aliases applied, like in SQL, to control the name of the generated attribute in the data store you write to. You simply add the name of the item you require to the definition of the summary item, including functions.
 
@@ -205,6 +205,24 @@ The Threads parameter is the number of threads used to do the query. This is due
 
 ##### Web Based Query API
 The Aggregators Web Application also provides several query APIs, which return data in JSON format. When deployed, you can make an HTTP request to a variety of endpoints to retrieve different types of data.
+
+###### Viewing the Running Configuration
+
+You can view the Configuration of your Aggregators at URL ```<web application>/configuration```, which returns an object such as:
+
+```
+{
+    "region": "eu-west-1",
+    "environment": null,
+    "config-file-url": "s3://meyersi-ire/kinesis/sensor-consumer-regex.json",
+    "application-name": "EnergyRealTimeDataConsumer",
+    "max-records": "2500",
+    "stream-name": "EnergyPipelineSensors",
+    "failures-tolerated": null,
+    "position-in-stream": "LATEST",
+    "version": ".9.2.6.6"
+}
+```
 
 ###### Date Based Queries
 

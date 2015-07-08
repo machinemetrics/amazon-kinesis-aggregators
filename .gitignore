@@ -1,5 +1,6 @@
-target/
 *.iws
 *.iml
 *.ipr
 .idea
+/bin/
+/target/
