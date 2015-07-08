@@ -18,6 +18,7 @@ package com.amazonaws.services.kinesis.aggregators;
 
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -731,13 +732,17 @@ public class StreamAggregator implements IStreamAggregator {
                         // generate the local updates, one per time horizon that
                         // is requested
                         for (TimeHorizon h : timeHorizons) {
+                            OffsetDateTime localEventDate = eventDate;
+                            if (!h.isUTC())
+                                localEventDate = eventDate.plus(Duration.ofMillis(data.getLocalOffset()));
+
                             // atomically update the aggregate table with event
                             // count or count + summaries
                             cache.update(
                                     aggregatorType,
                                     data.getLabels(),
-                                    (timeHorizons.size() > 1 ? h.getItemWithMultiValueFormat(eventDate)
-                                            : h.getValue(eventDate)), h, event.getSequenceNumber(),
+                                    (timeHorizons.size() > 1 ? h.getItemWithMultiValueFormat(localEventDate)
+                                            : h.getValue(localEventDate)), h, event.getSequenceNumber(),
                                     1, data.getSummaries(), dataExtractor.getSummaryConfig());
                         }
                     }

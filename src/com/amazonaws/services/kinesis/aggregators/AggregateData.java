@@ -27,6 +27,8 @@ public class AggregateData {
 
     private OffsetDateTime date;
 
+    private long localOffset;
+
     private Map<String, Double> summaries;
 
     public AggregateData(String uniqueId, LabelSet labels, OffsetDateTime date, Map<String, Double> summaries) {
@@ -34,6 +36,14 @@ public class AggregateData {
         this.labels = labels;
         this.date = date;
         this.summaries = summaries;
+    }
+
+    public AggregateData(String uniqueId, LabelSet labels, OffsetDateTime date, Map<String, Double> summaries, long localOffset) {
+        this.uniqueId = uniqueId;
+        this.labels = labels;
+        this.date = date;
+        this.summaries = summaries;
+        this.localOffset = localOffset;
     }
 
     public String getUniqueId() {
@@ -54,5 +64,9 @@ public class AggregateData {
 
     public Map<String, Double> getSummaries() {
         return this.summaries;
+    }
+
+    public long getLocalOffset () {
+        return this.localOffset;
     }
 }

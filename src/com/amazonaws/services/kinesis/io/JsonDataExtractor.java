@@ -49,6 +49,8 @@ public class JsonDataExtractor extends AbstractDataExtractor implements IDataExt
 
     private String labelName, dateFormat, uniqueIdAttribute, dateValueAttribute;
 
+    private String offsetAttribute = "local_offset_millis";
+
     private DateTimeFormatter dateFormatter;
 
     private List<String> summaryAttributes;
@@ -82,6 +84,7 @@ public class JsonDataExtractor extends AbstractDataExtractor implements IDataExt
             OffsetDateTime dateValue = null;
             JsonNode jsonContent = null;
             String dateString, summary = null;
+            long localOffset = 0;
             sumUpdates = new HashMap<>();
 
             List<String> items = (List<String>) serialiser.toClass(event);
@@ -171,7 +174,21 @@ public class JsonDataExtractor extends AbstractDataExtractor implements IDataExt
                     }
                 }
 
-                aggregateData.add(new AggregateData(uniqueId, labels, dateValue, sumUpdates));
+                // get local offset
+                if (offsetAttribute != null) {
+                    try {
+                        String offsetString = StreamAggregatorUtils.readValueAsString(jsonContent, offsetAttribute);
+                        if (offsetString != null)
+                            localOffset = Long.parseLong(offsetString);
+                    } catch (NumberFormatException nfe) {
+                        LOG.error(String.format(
+                            "Unable to deserialise local offset '%s' due to NumberFormatException",
+                            dateValueAttribute));
+                        throw new SerializationException(nfe);
+                    }
+                }
+
+                aggregateData.add(new AggregateData(uniqueId, labels, dateValue, sumUpdates, localOffset));
             }
 
             return aggregateData;
