@@ -734,7 +734,7 @@ public class StreamAggregator implements IStreamAggregator {
                         for (TimeHorizon h : timeHorizons) {
                             OffsetDateTime localEventDate = eventDate;
                             if (!h.isUTC())
-                                localEventDate = eventDate.plus(Duration.ofMillis(data.getLocalOffset()));
+                                localEventDate = eventDate.minus(Duration.ofMillis(data.getLocalOffset()));
 
                             // atomically update the aggregate table with event
                             // count or count + summaries
