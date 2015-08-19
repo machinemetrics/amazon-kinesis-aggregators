@@ -19,6 +19,7 @@ package com.amazonaws.services.kinesis.aggregators.consumer;
 import java.net.NetworkInterface;
 import java.util.UUID;
 
+import com.amazonaws.services.kinesis.metrics.impl.NullMetricsFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -88,7 +89,7 @@ public final class AggregatorConsumer {
 
 		IRecordProcessorFactory recordProcessorFactory = new AggregatorProcessorFactory(
 				aggGroup);
-		worker = new Worker(recordProcessorFactory, this.config);
+		worker = new Worker(recordProcessorFactory, this.config, new NullMetricsFactory());
 
 		int exitCode = 0;
 		int failures = 0;
