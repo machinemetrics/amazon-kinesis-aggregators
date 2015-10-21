@@ -23,7 +23,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public enum TimeHorizon {
-    SECOND(0, "MM-dd HH:mm:ss", "s"), MINUTE(1, "MM-dd HH:mm:00", "m"), MINUTES_GROUPED(1, null,
+    MILLISECOND(0, "MM-dd HH:mm:ss.SSS", "S"),
+    SECOND(1, "MM-dd HH:mm:ss", "s"),
+    MINUTE(2, "MM-dd HH:mm:00", "m"),
+    MINUTES_GROUPED(2, null,
             "mb") {
         private int scope;
 
@@ -46,8 +49,11 @@ public enum TimeHorizon {
                     forDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH")), bucket);
         }
     },
-    HOUR(2, "MM-dd HH:00:00", "H"), DAY(3, "MM-dd 00:00:00", "d"), MONTH(4, "MM-01 00:00:00", "M"), YEAR(
-            5, "01-01 00:00:00", "Y"), FOREVER(999, "", "*") {
+    HOUR(3, "MM-dd HH:00:00", "H"),
+    DAY(4, "MM-dd 00:00:00", "d"),
+    MONTH(5, "MM-01 00:00:00", "M"),
+    YEAR(6, "01-01 00:00:00", "Y"),
+    FOREVER(999, "", "*") {
         /**
          * Override the getValue method, as TimeHorizon.FOREVER is for all
          * values regardless of time period. We'll set the value to '*' as
