@@ -19,11 +19,15 @@ package com.amazonaws.services.kinesis.io.serializer;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
 
 import com.amazonaws.services.kinesis.aggregators.InputEvent;
+import com.amazonaws.services.kinesis.aggregators.StreamAggregatorUtils;
+import com.amazonaws.services.kinesis.aggregators.exception.SerializationException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @SuppressWarnings("rawtypes")
@@ -94,8 +98,25 @@ public class JsonSerializer implements IKinesisSerializer<Object, byte[]> {
                 // single json object per record
                 String item = new String(event.getData(), this.charset);
 
-                if (filterRegex == null || (filterRegex != null && p.matcher(item).matches())) {
-                    jsonStringList.add(item);
+                if (item.charAt(0) == '[') {
+                    try {
+                        JsonNode json = StreamAggregatorUtils.asJsonNode(item);
+                        for (Iterator<JsonNode> iter = json.elements(); iter.hasNext();) {
+                            JsonNode child = iter.next();
+                            item = child.toString();
+
+                            if (filterRegex == null || (filterRegex != null && p.matcher(item).matches())) {
+                                jsonStringList.add(item);
+                            }
+                        }
+                    } catch (Exception e) {
+                        throw new IOException(e);
+                    }
+                }
+                else {
+                    if (filterRegex == null || (filterRegex != null && p.matcher(item).matches())) {
+                        jsonStringList.add(item);
+                    }
                 }
 
                 return jsonStringList;
