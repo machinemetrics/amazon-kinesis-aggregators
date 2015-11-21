@@ -85,7 +85,6 @@ public class JsonDataExtractor extends AbstractDataExtractor implements IDataExt
             JsonNode jsonContent = null;
             String dateString, summary = null;
             long localOffset = 0;
-            sumUpdates = new HashMap<>();
 
             List<String> items = (List<String>) serialiser.toClass(event);
 
@@ -101,6 +100,7 @@ public class JsonDataExtractor extends AbstractDataExtractor implements IDataExt
             for (String item : items) {
                 // Convert the string to a Jackson JsonNode for navigation
                 jsonContent = StreamAggregatorUtils.asJsonNode(item);
+                sumUpdates = new HashMap<>();
 
                 LabelSet labels = new LabelSet();
                 for (String key : this.labelAttributes) {

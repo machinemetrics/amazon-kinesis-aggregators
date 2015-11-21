@@ -269,10 +269,10 @@ public class AggregateCache {
             logInfo(String.format("%s Pending Aggregates to be flushed", pendingUpdates.size()));
         }
 
-        if (pendingUpdates.size() > warnUpdatesPendingCount) {
-            logWarn(String.format("Warning - %s Pending Aggregates - Checkpoint NOW",
-                    pendingUpdates.size()));
-        }
+        //if (pendingUpdates.size() > warnUpdatesPendingCount) {
+        //    logWarn(String.format("Warning - %s Pending Aggregates - Checkpoint NOW",
+        //            pendingUpdates.size()));
+        //}
 
         // checkpoint manually at the force threshold to prevent the aggregator
         // falling over
